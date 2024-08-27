@@ -47,11 +47,13 @@ public class StatusBarSettings extends SettingsPreferenceFragment
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.status_bar_settings);
 
+/*
         mStatusBarAmPm = findPreference(STATUS_BAR_AM_PM);
         mStatusBarClock = findPreference(STATUS_BAR_CLOCK_STYLE);
         mStatusBarClock.setOnPreferenceChangeListener(this);
 
         mStatusBarClockCategory = getPreferenceScreen().findPreference(CATEGORY_CLOCK);
+*/
 
         mQuickPulldown = findPreference(STATUS_BAR_QUICK_QS_PULLDOWN);
         mQuickPulldown.setOnPreferenceChangeListener(this);
@@ -62,6 +64,7 @@ public class StatusBarSettings extends SettingsPreferenceFragment
     public void onResume() {
         super.onResume();
 
+/*
         final String curIconBlacklist = Settings.Secure.getString(getContext().getContentResolver(),
                 ICON_BLACKLIST);
 
@@ -75,11 +78,13 @@ public class StatusBarSettings extends SettingsPreferenceFragment
             mStatusBarAmPm.setEnabled(false);
             mStatusBarAmPm.setSummary(R.string.status_bar_am_pm_info);
         }
+*/
 
         final boolean disallowCenteredClock = DeviceUtils.hasCenteredCutout(getActivity());
 
         // Adjust status bar preferences for RTL
         if (getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL) {
+/*
             if (disallowCenteredClock) {
                 mStatusBarClock.setEntries(R.array.status_bar_clock_position_entries_notch_rtl);
                 mStatusBarClock.setEntryValues(R.array.status_bar_clock_position_values_notch);
@@ -87,8 +92,10 @@ public class StatusBarSettings extends SettingsPreferenceFragment
                 mStatusBarClock.setEntries(R.array.status_bar_clock_position_entries_rtl);
                 mStatusBarClock.setEntryValues(R.array.status_bar_clock_position_values);
             }
+*/
             mQuickPulldown.setEntries(R.array.status_bar_quick_qs_pulldown_entries_rtl);
         } else {
+/*
             if (disallowCenteredClock) {
                 mStatusBarClock.setEntries(R.array.status_bar_clock_position_entries_notch);
                 mStatusBarClock.setEntryValues(R.array.status_bar_clock_position_values_notch);
@@ -96,6 +103,7 @@ public class StatusBarSettings extends SettingsPreferenceFragment
                 mStatusBarClock.setEntries(R.array.status_bar_clock_position_entries);
                 mStatusBarClock.setEntryValues(R.array.status_bar_clock_position_values);
             }
+*/
             mQuickPulldown.setEntries(R.array.status_bar_quick_qs_pulldown_entries);
         }
     }
@@ -108,8 +116,10 @@ public class StatusBarSettings extends SettingsPreferenceFragment
             case STATUS_BAR_QUICK_QS_PULLDOWN:
                 updateQuickPulldownSummary(value);
                 break;
+/*
             case STATUS_BAR_CLOCK_STYLE:
                 break;
+*/
         }
         return true;
     }
