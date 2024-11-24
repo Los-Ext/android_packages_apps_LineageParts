@@ -321,8 +321,7 @@ public class LongScreenSettings extends SettingsPreferenceFragment
             boolean show = !mAllPackagesAdapter.mEntries.contains(entry.info.packageName);
             if (show) {
                 synchronized (mLauncherResolveInfoList) {
-                    show = mLauncherResolveInfoList.contains(entry.info.packageName) &&
-                            entry.info.targetSdkVersion < Build.VERSION_CODES.O;
+                    show = mLauncherResolveInfoList.contains(entry.info.packageName);
                 }
             }
             return show;
