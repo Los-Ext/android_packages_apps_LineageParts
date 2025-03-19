@@ -454,7 +454,7 @@ public class ButtonSettings extends SettingsPreferenceFragment
 
         mEnableTaskbar = findPreference(KEY_ENABLE_TASKBAR);
         if (mEnableTaskbar != null) {
-            if (!isLargeScreen(requireContext()) || !hasNavigationBar()) {
+            if (!hasNavigationBar()) {
                 mNavigationPreferencesCat.removePreference(mEnableTaskbar);
             } else {
                 mEnableTaskbar.setOnPreferenceChangeListener(this);
@@ -955,7 +955,7 @@ public class ButtonSettings extends SettingsPreferenceFragment
                 result.add(KEY_BUTTON_BACKLIGHT);
             }
 
-            if (!isLargeScreen(context) || !hasNavigationBar()) {
+            if (!hasNavigationBar()) {
                 result.add(KEY_ENABLE_TASKBAR);
             }
 
