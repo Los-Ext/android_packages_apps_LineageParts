@@ -97,7 +97,6 @@ public class ButtonSettings extends SettingsPreferenceFragment
             "click_partial_screenshot";
     private static final String KEY_SWAP_CAPACITIVE_KEYS = "swap_capacitive_keys";
     private static final String KEY_NAV_BAR_INVERSE = "sysui_nav_bar_inverse";
-    private static final String KEY_ENABLE_TASKBAR = "enable_taskbar";
 
     private static final String CATEGORY_POWER = "power_key";
     private static final String CATEGORY_HOME = "home_key";
@@ -135,7 +134,6 @@ public class ButtonSettings extends SettingsPreferenceFragment
     private ListPreference mTorchLongPressPowerTimeout;
     private SwitchPreferenceCompat mSwapCapacitiveKeys;
     private SwitchPreferenceCompat mNavBarInverse;
-    private SwitchPreferenceCompat mEnableTaskbar;
 
     private PreferenceCategory mNavigationPreferencesCat;
 
@@ -452,18 +450,6 @@ public class ButtonSettings extends SettingsPreferenceFragment
 
         mNavBarInverse = findPreference(KEY_NAV_BAR_INVERSE);
 
-        mEnableTaskbar = findPreference(KEY_ENABLE_TASKBAR);
-        if (mEnableTaskbar != null) {
-            if (!hasNavigationBar()) {
-                mNavigationPreferencesCat.removePreference(mEnableTaskbar);
-            } else {
-                mEnableTaskbar.setOnPreferenceChangeListener(this);
-                mEnableTaskbar.setChecked(LineageSettings.System.getInt(resolver,
-                        LineageSettings.System.ENABLE_TASKBAR,
-                        isLargeScreen(requireContext()) ? 1 : 0) == 1);
-            }
-        }
-
         List<Integer> unsupportedValues = new ArrayList<>();
         List<String> entries = new ArrayList<>(
                 Arrays.asList(res.getStringArray(R.array.hardware_keys_action_entries)));
@@ -644,10 +630,6 @@ public class ButtonSettings extends SettingsPreferenceFragment
             return true;
         } else if (preference == mSwapCapacitiveKeys) {
             mHardware.set(LineageHardwareManager.FEATURE_KEY_SWAP, (Boolean) newValue);
-            return true;
-        } else if (preference == mEnableTaskbar) {
-            LineageSettings.System.putInt(getContentResolver(),
-                    LineageSettings.System.ENABLE_TASKBAR, ((Boolean) newValue) ? 1 : 0);
             return true;
         }
         return false;
@@ -953,10 +935,6 @@ public class ButtonSettings extends SettingsPreferenceFragment
             if (!DeviceUtils.hasButtonBacklightSupport(context)
                     && !DeviceUtils.hasKeyboardBacklightSupport(context)) {
                 result.add(KEY_BUTTON_BACKLIGHT);
-            }
-
-            if (!hasNavigationBar()) {
-                result.add(KEY_ENABLE_TASKBAR);
             }
 
             if (hasNavigationBar()) {
