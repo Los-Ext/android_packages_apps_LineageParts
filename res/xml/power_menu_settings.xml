@@ -54,7 +54,7 @@
             android:key="advanced_reboot"
             android:title="@string/power_menu_advanced_restart_title"
             android:summary="@string/power_menu_advanced_restart_summary"
-            android:defaultValue="false" />
+            android:defaultValue="true" />
 
     </PreferenceCategory>
 
