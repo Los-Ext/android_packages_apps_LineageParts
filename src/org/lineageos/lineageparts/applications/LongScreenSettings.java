@@ -4,6 +4,7 @@
  */
 package org.lineageos.lineageparts.applications;
 
+import android.app.ActivityManager;
 import android.annotation.Nullable;
 import android.content.Context;
 import android.content.Intent;
@@ -161,6 +162,13 @@ public class LongScreenSettings extends PreferenceFragmentCompat
         mSession.rebuild(mActivityFilter, ApplicationsState.ALPHA_COMPARATOR);
     }
 
+    private void forceStopApp(String packageName) {
+        ActivityManager am = (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        if (am != null) {
+            am.forceStopPackage(packageName);
+        }
+    }
+
     private class AllPackagesAdapter extends RecyclerView.Adapter<AllPackagesAdapter.ViewHolder>
             implements SectionIndexer {
 
@@ -193,12 +201,15 @@ public class LongScreenSettings extends PreferenceFragmentCompat
 
             holder.state.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 final ApplicationsState.AppEntry appEntry = (ApplicationsState.AppEntry) buttonView.getTag();
+                final String packageName = appEntry.info.packageName;
 
                 if (isChecked) {
-                    mLongScreen.addApp(appEntry.info.packageName);
+                    mLongScreen.addApp(packageName);
                 } else {
-                    mLongScreen.removeApp(appEntry.info.packageName);
+                    mLongScreen.removeApp(packageName);
                 }
+
+                forceStopApp(packageName);
             });
         }
 
