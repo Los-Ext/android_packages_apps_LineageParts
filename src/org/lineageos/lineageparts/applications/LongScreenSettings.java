@@ -10,33 +10,31 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.settingslib.applications.ApplicationsState;
-
 import com.google.android.material.materialswitch.MaterialSwitch;
 
 import org.lineageos.internal.applications.LongScreen;
 import org.lineageos.lineageparts.R;
-import org.lineageos.lineageparts.SettingsPreferenceFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class LongScreenSettings extends SettingsPreferenceFragment
+public class LongScreenSettings extends PreferenceFragmentCompat
         implements ApplicationsState.Callbacks {
 
     private AllPackagesAdapter mAllPackagesAdapter;
@@ -66,12 +64,15 @@ public class LongScreenSettings extends SettingsPreferenceFragment
     }
 
     @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+    }
+
+    @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        ListView userListView = view.findViewById(R.id.user_list_view);
+        RecyclerView userListView = view.findViewById(R.id.user_list_view);
+        userListView.setLayoutManager(new LinearLayoutManager(getContext()));
         userListView.setAdapter(mAllPackagesAdapter);
-        userListView.setEmptyView(view.findViewById(R.id.user_list_empty_view));
     }
 
     @Override
@@ -126,7 +127,7 @@ public class LongScreenSettings extends SettingsPreferenceFragment
     private void handleAppEntries(List<ApplicationsState.AppEntry> entries) {
         final ArrayList<String> sections = new ArrayList<>();
         final ArrayList<Integer> positions = new ArrayList<>();
-        final PackageManager pm = getPackageManager();
+        final PackageManager pm = getContext().getPackageManager();
         String lastSectionIndex = null;
         int offset = 0;
 
@@ -160,7 +161,7 @@ public class LongScreenSettings extends SettingsPreferenceFragment
         mSession.rebuild(mActivityFilter, ApplicationsState.ALPHA_COMPARATOR);
     }
 
-    private class AllPackagesAdapter extends BaseAdapter
+    private class AllPackagesAdapter extends RecyclerView.Adapter<AllPackagesAdapter.ViewHolder>
             implements SectionIndexer {
 
         private final LayoutInflater mInflater;
@@ -173,58 +174,37 @@ public class LongScreenSettings extends SettingsPreferenceFragment
             mActivityFilter = new ActivityFilter(context.getPackageManager());
         }
 
+        @NonNull
         @Override
-        public int getCount() {
-            return mEntries.size();
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View itemView = mInflater.inflate(R.layout.long_screen_list_item, parent, false);
+            return new ViewHolder(itemView);
         }
 
         @Override
-        public Object getItem(int position) {
-            return mEntries.get(position);
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return true;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return mEntries.get(position).id;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             ApplicationsState.AppEntry entry = mEntries.get(position);
-            ViewHolder holder;
-
-            if (convertView == null) {
-                holder = new ViewHolder(mInflater.inflate(
-                        R.layout.long_screen_list_item, parent, false));
-                holder.state.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                    final ApplicationsState.AppEntry appEntry =
-                            (ApplicationsState.AppEntry) buttonView.getTag();
-
-                    if (isChecked) {
-                        mLongScreen.addApp(appEntry.info.packageName);
-                    } else {
-                        mLongScreen.removeApp(appEntry.info.packageName);
-                    }
-                });
-            } else {
-                holder = (ViewHolder) convertView.getTag();
-            }
-
-            if (entry == null) {
-                return holder.rootView;
-            }
 
             holder.title.setText(entry.label);
             mApplicationsState.ensureIcon(entry);
             holder.icon.setImageDrawable(entry.icon);
             holder.state.setTag(entry);
             holder.state.setChecked(mLongScreen.shouldForceLongScreen(entry.info.packageName));
-            return holder.rootView;
+
+            holder.state.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                final ApplicationsState.AppEntry appEntry = (ApplicationsState.AppEntry) buttonView.getTag();
+
+                if (isChecked) {
+                    mLongScreen.addApp(appEntry.info.packageName);
+                } else {
+                    mLongScreen.removeApp(appEntry.info.packageName);
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return mEntries.size();
         }
 
         private void setEntries(List<ApplicationsState.AppEntry> entries,
@@ -249,20 +229,11 @@ public class LongScreenSettings extends SettingsPreferenceFragment
 
         @Override
         public int getSectionForPosition(int position) {
-            if (position < 0 || position >= getCount()) {
+            if (position < 0 || position >= getItemCount()) {
                 return -1;
             }
 
             final int index = Arrays.binarySearch(mPositions, position);
-
-            /*
-             * Consider this example: section positions are 0, 3, 5; the supplied
-             * position is 4. The section corresponding to position 4 starts at
-             * position 3, so the expected return value is 1. Binary search will not
-             * find 4 in the array and thus will return -insertPosition-1, i.e. -3.
-             * To get from that number to the expected value of 1 we need to negate
-             * and subtract 2.
-             */
             return index >= 0 ? index : -index - 2;
         }
 
@@ -270,21 +241,18 @@ public class LongScreenSettings extends SettingsPreferenceFragment
         public Object[] getSections() {
             return mSections;
         }
-    }
 
-    private static class ViewHolder {
-        private final TextView title;
-        private final ImageView icon;
-        private final MaterialSwitch state;
-        private final View rootView;
+        public static class ViewHolder extends RecyclerView.ViewHolder {
+            private final TextView title;
+            private final ImageView icon;
+            private final MaterialSwitch state;
 
-        private ViewHolder(View view) {
-            this.title = view.findViewById(R.id.app_name);
-            this.icon = view.findViewById(R.id.app_icon);
-            this.state = view.findViewById(R.id.state);
-            this.rootView = view;
-
-            view.setTag(this);
+            public ViewHolder(View view) {
+                super(view);
+                this.title = view.findViewById(R.id.app_name);
+                this.icon = view.findViewById(R.id.app_icon);
+                this.state = view.findViewById(R.id.state);
+            }
         }
     }
 
@@ -295,7 +263,6 @@ public class LongScreenSettings extends SettingsPreferenceFragment
 
         private ActivityFilter(PackageManager packageManager) {
             this.mPackageManager = packageManager;
-
             updateLauncherInfoList();
         }
 
