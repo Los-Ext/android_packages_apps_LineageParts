@@ -512,6 +512,10 @@
     <string name="status_bar_brightness_slider_show_expanded">Show when expanded</string>
     <string name="status_bar_brightness_slider_show_always">Show always</string>
 
+    <!-- Status bar - Icon tinting -->
+    <string name="status_bar_tint_icons_title">Tint status bar icons</string>
+    <string name="status_bar_tint_icons_summary">Tint status bar icons with system accent color</string>
+
     <!-- Status bar - Network Traffic -->
     <string name="network_traffic_settings_title">Network traffic monitor</string>
     <string name="network_traffic_settings_summary">Show current network traffic levels in the status bar</string>

@@ -27,6 +27,12 @@
             <intent android:action="com.android.settings.action.STATUS_BAR_TUNER" />
         </Preference>
 
+        <com.lineage.support.preferences.SystemSettingSwitchPreference
+            android:key="tint_statusbar_icons_with_accent"
+            android:title="@string/status_bar_tint_icons_title"
+            android:summary="@string/status_bar_tint_icons_summary"
+            android:defaultValue="false" />
+
     </PreferenceCategory>
 
     <PreferenceCategory
