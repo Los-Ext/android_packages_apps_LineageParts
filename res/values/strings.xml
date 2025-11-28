@@ -28,6 +28,7 @@
     <string name="search">Search</string>
     <string name="disabled">Disabled</string>
     <string name="enabled">Enabled</string>
+    <string name="unit_pixels" translatable="false">dp</string>
 
     <!-- DO NOT TRANSLATE Empty summary for dynamic preferences -->
     <string name="summary_empty" translatable="false" />
